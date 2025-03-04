@@ -75,13 +75,25 @@ function QRGeneratorApp() {
       const jsonData = XLSX.utils.sheet_to_json(sheet)
 
       if (jsonData.length === 0) {
-        throw new Error("The Excel file is empty")
+        // Only show toast, don't set error state
+        addToast({
+          title: "Excel File Error",
+          description: "The Excel file is empty",
+          variant: "destructive",
+        })
+        return
       }
 
       // Check if the file has a "Link" column
       const firstRow = jsonData[0]
       if (!firstRow.hasOwnProperty("Link")) {
-        throw new Error("The Excel file must contain a 'Link' column")
+        // Only show toast, don't set error state
+        addToast({
+          title: "Excel File Error",
+          description: "The Excel file must contain a 'Link' column",
+          variant: "destructive",
+        })
+        return
       }
 
       const allColumns = Object.keys(jsonData[0])
@@ -90,8 +102,14 @@ function QRGeneratorApp() {
       setColumns(filteredColumns)
       setSelectedColumns(filteredColumns)
       setData(jsonData)
+      setError(null) // Clear any previous errors
     } catch (err) {
-      setError("Error processing Excel file: " + (err instanceof Error ? err.message : String(err)))
+      // Only show toast, don't set error state
+      addToast({
+        title: "Excel File Error",
+        description: "Error processing Excel file",
+        variant: "destructive",
+      })
     }
   }
 
@@ -172,7 +190,7 @@ function QRGeneratorApp() {
       <main className="flex-grow container mx-auto p-4">
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Bulk QR Code Generator</CardTitle>
+            <CardTitle>One or Many, Instantly!</CardTitle>
             <CardDescription>Generate QR codes with custom data and logo</CardDescription>
           </CardHeader>
           <CardContent>
@@ -180,7 +198,7 @@ function QRGeneratorApp() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Input Source Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Input Source</h3>
+                  <h3 className="text-lg font-bold">Input Source</h3>
                   <div className="flex items-center space-x-4">
                     <Switch
                       id="use-eh-file"
@@ -238,7 +256,7 @@ function QRGeneratorApp() {
 
                 {/* Logo Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Logo Options</h3>
+                  <h3 className="text-lg font-bold">Logo Options</h3>
                   <div className="flex items-center space-x-4">
                     <Switch
                       id="use-uploaded-logo"
@@ -286,6 +304,7 @@ function QRGeneratorApp() {
           </CardContent>
         </Card>
 
+        {/* Only show the error alert for generation errors, not for validation errors */}
         {error && (
           <Alert variant="destructive" className="mt-4">
             <AlertTitle>Error</AlertTitle>
@@ -311,8 +330,14 @@ function QRGeneratorApp() {
               })
             }}
             onError={(err) => {
+              // Set error state for generation errors
               setError(err)
               setIsGenerating(false)
+              addToast({
+                title: "Generation Error",
+                description: err,
+                variant: "destructive",
+              })
             }}
           />
         )}

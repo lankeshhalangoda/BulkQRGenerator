@@ -16,7 +16,7 @@ export function Header() {
               className="object-contain"
             />
           </div>
-          <h1 className="text-2xl font-bold">Emojot QR Generator</h1>
+          <h1 className="text-2xl font-bold">QR Code Generator</h1>
         </div>
         <UserGuide />
       </div>

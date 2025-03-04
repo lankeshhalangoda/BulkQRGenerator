@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import QRCode from "qrcode"
 import JSZip from "jszip"
 
@@ -31,7 +31,13 @@ export default function QRCodeGenerator({
   onComplete,
   onError,
 }: QRCodeGeneratorProps) {
+  // Add a ref to track if onComplete has been called
+  const hasCompletedRef = useRef(false)
+
   useEffect(() => {
+    // Reset the ref when the component mounts
+    hasCompletedRef.current = false
+
     const generateQRCodes = async () => {
       try {
         const zip = new JSZip()
@@ -40,7 +46,6 @@ export default function QRCodeGenerator({
         const generatedQRCodes: string[] = []
 
         for (const item of data) {
-          // Use singleQRText for single QR codes if provided, otherwise use selected columns
           const displayText = isSingleQR
             ? singleQRText
             : selectedColumns
@@ -68,19 +73,25 @@ export default function QRCodeGenerator({
 
         // Store the zip content but don't automatically download it
         const content = await zip.generateAsync({ type: "blob" })
-        // Store the zip blob in a global variable to be used later
         window.zipBlob = content
 
-        // Removed the automatic download
-        // FileSaver.saveAs(content, isSingleQR ? "QR_Code.zip" : "QR_Codes.zip")
-
-        onComplete(generatedQRCodes)
+        // Only call onComplete if it hasn't been called yet
+        if (!hasCompletedRef.current) {
+          hasCompletedRef.current = true
+          onComplete(generatedQRCodes)
+        }
       } catch (err) {
         onError("Error generating QR codes: " + (err instanceof Error ? err.message : String(err)))
       }
     }
 
     generateQRCodes()
+
+    // Cleanup function
+    return () => {
+      // This ensures we don't call onComplete if the component unmounts
+      hasCompletedRef.current = true
+    }
   }, [data, selectedColumns, logo, isDefaultLogo, isSingleQR, singleQRText, onComplete, onError])
 
   return null

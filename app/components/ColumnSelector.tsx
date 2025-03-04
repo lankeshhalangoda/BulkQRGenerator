@@ -10,7 +10,7 @@ interface ColumnSelectorProps {
 export default function ColumnSelector({ columns, selectedColumns, onToggle }: ColumnSelectorProps) {
   return (
     <div className="space-y-2">
-      <Label>Select Columns to Include</Label>
+      <Label>QR Code Text (Optional)</Label>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {columns.map((column) => (
           <div key={column} className="flex items-center space-x-2">
