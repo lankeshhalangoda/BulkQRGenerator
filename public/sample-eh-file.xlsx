@@ -1,0 +1,7 @@
+// This is a placeholder for the Excel file
+// You'll need to create an actual Excel file with the following structure:
+// Link | Location | Branch | Region | Any other columns
+// https://example.com/1 | Location 1 | Branch A | Region X | ...
+// https://example.com/2 | Location 2 | Branch B | Region Y | ...
+// etc.
+
